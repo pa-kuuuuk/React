@@ -3,6 +3,7 @@ import React, {Component} from 'react';
 import TOC from './components/TOC';
 import ReadContent from './components/ReadContent';
 import CreateContent from './components/CreateContent';
+import UpdateContent from './components/UpdateContent';
 
 import Subject from './components/Subject';
 import Control from './components/Control';
@@ -24,24 +25,26 @@ class App extends Component {
     }
     this.max_content_id = this.state.contents.length;
   }
-  render(){
+  getReadContent(){
+    var i = 0;
+      while(i< this.state.contents.length){
+        var data = this.state.contents[i];
+        if(data.id === this.state.selected_content_id){
+          return data;
+          break;
+        }
+        i++;
+      }
+  }
+  getContent(){
     var _title, _desc, _article = null;
     if(this.state.mode ==="welcome"){
       _title= this.state.welcome.title;
       _desc= this.state.welcome.desc;
       _article= <ReadContent title={_title} desc={_desc}></ReadContent>;
     }else if(this.state.mode === 'read'){
-      var i = 0;
-      while(i< this.state.contents.length){
-        var data = this.state.contents[i];
-        if(data.id === this.state.selected_content_id){
-          _title=this.state.contents[i].title;
-          _desc=this.state.contents[i].desc;
-          break;
-        }
-        i++;
-      }
-     _article = <ReadContent title={_title} desc={_desc}></ReadContent>;
+     var _content = this.getReadContent();
+     _article = <ReadContent title={_content.title} desc={_content.desc}></ReadContent>;
     }else if(this.state.mode === "create"){
       _article = <CreateContent onSubmit={function(_title, _desc){
           //add content to this.state.contents
@@ -57,7 +60,27 @@ class App extends Component {
             contents:_contents
           });
       }.bind(this)}></CreateContent>
+    }else if(this.state.mode === "update"){
+      _content = this.getReadContent();
+      _article = <UpdateContent data={_content} onSubmit={function(_id,_title, _desc){
+          var _contents = Array.from(this.state.contents);
+          var i = 0;
+          while( i<_contents.length){
+            if(_contents[i].id === _id){
+              _contents[i] = {id:_id, title:_title, desc:_desc};
+              break;
+            }
+            i++;
+          }
+          this.setState({
+            contents:_contents
+          });
+      }.bind(this)}></UpdateContent>
     }
+    return _article;
+  }
+  render(){
+    
   return (
     <div className="App">
       <Subject 
@@ -83,7 +106,7 @@ class App extends Component {
           mode: _mode
         })
       }.bind(this)}></Control>
-      {_article}
+      {this.getContent()}
     </div>
   );
 }
