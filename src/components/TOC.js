@@ -1,6 +1,14 @@
 import React, {Component} from 'react';
 
 class TOC extends Component{
+  //돔이변경되지 않았을때 렌더링 하지않는법
+  shouldComponentUpdate(newProps, newState){
+    if(this.props.data === newProps.date){
+      return false;
+    }
+    return true;
+  }
+
     render(){
         var lists =[];
         var data = this.props.data;
